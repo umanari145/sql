@@ -60,3 +60,4 @@ FROM
   DistrictProducts d1
 ORDER BY
   d1.district,rank ASC
+
