@@ -26,3 +26,28 @@ HAVING COUNT(*) = (
                 income
         ) t1
 )
+
+-- data read.mdのリンクの/* 関係除算でバスケット解析 */
+--   goal
+-- shop | count
+-- ------+-------
+--  東京 |     3
+--  仙台 |     3
+
+SELECT
+  shopitems.shop,
+  count(*)
+FROM
+  items2
+LEFT JOIN
+  shopitems
+ON
+  items2.item = shopitems.item
+GROUP BY
+  shopitems.shop
+HAVING COUNT(*)  = (SELECT COUNT(*) FROM items2);
+
+
+
+
+
