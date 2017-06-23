@@ -47,7 +47,44 @@ GROUP BY
   shopitems.shop
 HAVING COUNT(*)  = (SELECT COUNT(*) FROM items2);
 
+--data read.mdのリンクのメジアンを求めるSQL：自己非等値結合をHAVING句で使う(p.70)
+-- goal
+-- avg
+-- 17500
 
+-- step1 自分の順位(ただし通常の順位ではなく、重複があった場合は順位が下がる場合)を求める
+--- 例 100,90,90,80,80,80があった場合は100が1,90が3,80が6
 
+SELECT
+  g1.income,
+  (SELECT COUNT(*) FROM graduates g2  WHERE g2.income >= g1.income ) as order_inc_myself
+FROM
+  graduates g1;
 
+--step2 逆側からももとめる
+SELECT
+  g1.income,
+  (SELECT COUNT(*) FROM graduates g2  WHERE g2.income >= g1.income ) as order_inc_myself1,
+  (SELECT COUNT(*) FROM graduates g3  WHERE g3.income <= g1.income ) as order_inc_myself2
+FROM
+  graduates g1;
+
+--step3 order_incが中間のものを両サイドから挟んで総数が半分より上のものを取得する
+--　イメージが難しいので達人に学ぶSQL指南書のP70の数字がいいかも
+SELECT
+  g1.income
+FROM
+  graduates g1
+WHERE
+  (SELECT COUNT(*) FROM graduates g2  WHERE g2.income >= g1.income ) >= ( SELECT COUNT(*)/2 FROM graduates ) AND
+  (SELECT COUNT(*) FROM graduates g3  WHERE g3.income <= g1.income ) >= ( SELECT COUNT(*)/2 FROM graduates )
+
+--step4 step3の結果を見ればわかるが重複を無視して平均をとる
+SELECT
+  AVG(distinct g1.income)
+FROM
+  graduates g1
+WHERE
+  (SELECT COUNT(*) FROM graduates g2  WHERE g2.income >= g1.income ) >= ( SELECT COUNT(*)/2 FROM graduates ) AND
+  (SELECT COUNT(*) FROM graduates g3  WHERE g3.income <= g1.income ) >= ( SELECT COUNT(*)/2 FROM graduates )
 
