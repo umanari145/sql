@@ -45,3 +45,68 @@ FROM
   sales this_year,sales last_year
 WHERE
   this_year.year = last_year.year + 1
+
+-- data read.mdのリンクの/* --時系列に歯抜けがある場合：直近と比較 */
+-- goal
+
+
+--step1 まずは直近年を取得する方法をつかむ
+
+SELECT
+  s1.year as this_year,
+  MAX(s2.year) as compare_year
+FROM
+  sales2 s1 ,sales2 s2
+WHERE
+  s2.year < s1.year
+GROUP BY
+  s1.year
+
+--step1 別解
+SELECT
+  s1.year as this_year,
+  ( SELECT MAX(s2.year) FROM sales2 s2 WHERE s2.year < s1.year )  as compare_year_sale
+FROM
+  sales2 s1;
+
+--step2 step1をもとに比較して出力
+SELECT
+  s1.year as this_year,
+  s3.year as compare_year,
+  s1.sale as this_sale,
+  s3.sale as compare_sale
+FROM
+  sales2 s1,sales2 s3
+WHERE
+  s3.year = ( SELECT MAX(s2.year) FROM sales2 s2 WHERE s2.year < s1.year )
+
+--step3 変化をつけて出力 最初の年(1990)はでない
+SELECT
+  s1.year as this_year,
+  CASE
+    WHEN s1.sale - s3.sale > 0 THEN '↑'
+    WHEN s1.sale - s3.sale < 0 THEN '↓'
+    WHEN s1.sale - s3.sale = 0 THEN '='
+  ELSE NULL END AS diff
+FROM
+  sales2 s1,sales2 s3
+WHERE
+  s3.year =
+   ( SELECT MAX(s2.year) FROM sales2 s2 WHERE s2.year < s1.year )
+
+--別解 1990も出力 結合の利用(結合は別に被結合テーブルのカラムをくっつける必要はなく、
+-- 単純にWHEREと同じ)
+SELECT
+  s1.year as this_year,
+  CASE
+    WHEN s1.sale - s3.sale > 0 THEN '↑'
+    WHEN s1.sale - s3.sale < 0 THEN '↓'
+    WHEN s1.sale - s3.sale = 0 THEN '='
+  ELSE NULL END AS diff
+FROM
+  sales2 s1
+LEFT JOIN
+  sales s3
+ON
+  s3.year =
+   ( SELECT MAX(s2.year) FROM sales2 s2 WHERE s2.year < s1.year )
