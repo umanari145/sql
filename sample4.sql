@@ -48,6 +48,13 @@ WHERE
 
 -- data read.mdのリンクの/* --時系列に歯抜けがある場合：直近と比較 */
 -- goal
+--  this_year | diff
+-- -----------+------
+--       1990 |
+--       1992 | =
+--       1993 | =
+--       1994 | ↑
+--       1997 | ↑
 
 
 --step1 まずは直近年を取得する方法をつかむ
@@ -110,3 +117,30 @@ LEFT JOIN
 ON
   s3.year =
    ( SELECT MAX(s2.year) FROM sales2 s2 WHERE s2.year < s1.year )
+
+-- data read.mdのリンクの/* 累計を求める */
+-- goal
+---   prc_date  | onhand_amt
+--- ------------+------------
+---  2006-10-26 |      12000
+---  2006-10-28 |      14500
+---  2006-10-31 |       -500
+---  2006-11-03 |      33500
+---  2006-11-04 |      28500
+---  2006-11-06 |      35700
+---  2006-11-11 |      46700
+
+-- 分析関数を使う
+SELECT
+  prc_date ,
+  SUM(prc_amt) OVER (ORDER BY prc_date) AS onhand_amt
+FROM accounts;
+
+-- 生のSQL
+SELECT
+  a1.prc_date,
+  ( SELECT SUM(a2.prc_amt) FROM accounts a2 WHERE a2.prc_date <= a1.prc_date) AS onhand_amt
+FROM accounts a1;
+
+
+
