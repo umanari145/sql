@@ -133,7 +133,7 @@ ON
 -- 分析関数を使う
 SELECT
   prc_date ,
-  SUM(prc_amt) OVER (ORDER BY prc_date) AS onhand_amt
+  SUM(prc_amt) OVER (ORDER BY prc_date ) AS onhand_amt
 FROM accounts;
 
 -- 生のSQL
@@ -142,5 +142,31 @@ SELECT
   ( SELECT SUM(a2.prc_amt) FROM accounts a2 WHERE a2.prc_date <= a1.prc_date) AS onhand_amt
 FROM accounts a1;
 
+-- data read.mdのリンクの/* 移動累計を求める */
+-- goal
+---   prc_date  | onhand_amt
+--- ------------+------------
+---  2006-10-26 |      12000
+---  2006-10-28 |      14500
+---  2006-10-31 |       -500
+---  2006-11-03 |      21500
+---  2006-11-04 |      14000
+---  2006-11-06 |      36200
+---  2006-11-11 |      13200
 
+-- 分析関数
+SELECT
+  prc_date ,
+  SUM(prc_amt) OVER (ORDER BY prc_date ROWS 2 PRECEDING) AS onhand_amt
+FROM accounts;
 
+--- 生のSQL
+SELECT
+  a1.prc_date,
+  ( SELECT SUM(a2.prc_amt)
+     FROM accounts a2
+	WHERE a2.prc_date <= a1.prc_date
+	 AND
+	   --全く関係ないテーブルを1つ用意し、端店の間が3以内ということを示す
+	   ( SELECT COUNT(*) FROM accounts a3 WHERE a3.prc_date BETWEEN a2.prc_date AND a1.prc_date ) <= 3  ) AS onhand_amt
+FROM accounts a1;
