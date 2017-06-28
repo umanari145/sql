@@ -161,12 +161,29 @@ SELECT
 FROM accounts;
 
 --- 生のSQL
+--step1 3区間未満という条件をまず下記の用に抽出できることを確認する
+SELECT
+  a1.prc_date,
+  a2.prc_date AS past_date,
+  a2.prc_amt AS past_sum
+FROM
+  accounts a1
+LEFT JOIN
+  accounts a2
+ON
+  a2.prc_date <= a1.prc_date AND
+  --全く関係ないテーブルを1つ用意し、端店の間が3以内ということを示す
+ ( SELECT COUNT(*) FROM accounts a3 WHERE a3.prc_date BETWEEN a2.prc_date AND a1.prc_date ) <= 3
+-- JOINは自己結合とまったく同じで本来Nレコード×Mレコードの組み合わせをON以降の条件で絞っているのであって、
+-- WHEREと全く同じ。なので キー=キーである必要はなく上記のような条件文を入れることが可能。
+
+
+--step2 step1の考えを利用し累積を出す
 SELECT
   a1.prc_date,
   ( SELECT SUM(a2.prc_amt)
      FROM accounts a2
 	WHERE a2.prc_date <= a1.prc_date
 	 AND
-	   --全く関係ないテーブルを1つ用意し、端店の間が3以内ということを示す
 	   ( SELECT COUNT(*) FROM accounts a3 WHERE a3.prc_date BETWEEN a2.prc_date AND a1.prc_date ) <= 3  ) AS onhand_amt
 FROM accounts a1;
