@@ -187,3 +187,25 @@ SELECT
 	 AND
 	   ( SELECT COUNT(*) FROM accounts a3 WHERE a3.prc_date BETWEEN a2.prc_date AND a1.prc_date ) <= 3  ) AS onhand_amt
 FROM accounts a1;
+
+-- data read.mdのリンクの/* オーバーラップする期間を調べる */
+-- goal
+--  reserver | start_date |  end_date
+-- ----------+------------+------------
+--  荒木     | 2006-10-28 | 2006-10-31
+--  堀       | 2006-10-31 | 2006-11-01
+--  山本     | 2006-11-03 | 2006-11-04
+--  内田     | 2006-11-03 | 2006-11-05
+
+--前回の問題をやった後だと楽かも
+SELECT
+  r1.*
+FROM
+ reservations r1
+WHERE
+  EXISTS (
+    SELECT * FROM reservations r2 WHERE r1.reserver <> r2.reserver AND
+    (( r2.start_date  BETWEEN r1.start_date AND r1.end_date )
+     OR
+    (  r2.end_date  BETWEEN r1.start_date AND r1.end_date )))
+
