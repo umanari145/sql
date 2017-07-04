@@ -88,3 +88,21 @@ WHERE
      WHERE
         es.emp = es2.emp
   );
+
+
+-- data read.mdのリンクの等しい部分集合を見つける
+
+-- step1 自己結合し、共通した組み合わせをもつ(INNER JOINのほうがわかりやすいかも)
+SELECT
+ s1.sup as s1_sup,
+ s2.sup as s2_sup,
+ COUNT(*) as cnt
+FROM
+ supparts s1,supparts s2
+WHERE
+ s1.sup <> s2.sup AND s1.part = s2.part
+GROUP BY
+ s1_sup,s2_sup
+ORDER BY
+ s1_sup,s2_sup
+
