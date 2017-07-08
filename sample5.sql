@@ -178,4 +178,47 @@ FROM
 ORDER BY
   M1.meeting, M2.person
 
+-- data 肯定⇔二重否定の変換に慣れよう
+-- +------------+
+-- | student_id |
+-- +------------+
+-- |        100 |
+-- |        200 |
+-- |        400 |
+-- +------------+
 
+-- 全教科50点以上 => NOT EXISTS 50点以下
+SELECT
+ DISTINCT ts1.student_id
+FROM
+ TestScores ts1
+WHERE
+ NOT EXISTS (
+   SELECT * FROM  TestScores ts2 WHERE ts1.student_id = ts2.student_id AND ts2.score < 50
+ )
+
+
+--算数が80以上かつ国語が50以上
+-- +------------+
+-- | student_id |
+-- +------------+
+-- |        100 |
+-- |        200 |
+-- +------------+
+
+SELECT
+  tbl_1.student_id
+FROM
+(
+  SELECT
+    ts1.student_id,
+    CASE WHEN
+      ( ts1.subject = '国語' and ts1.score >= 50 ) or
+      ( ts1.subject = '算数' and ts1.score >= 80 )
+    THEN 1 ELSE 0 END as score_div
+    FROM TestScores ts1
+) tbl_1
+GROUP BY tbl_1.student_id
+HAVING SUM(tbl_1.score_div) = 2
+
+-- NOT EXISTSを使った方法(本はこれ)
