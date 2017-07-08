@@ -150,8 +150,32 @@ EXCEPT (
     p2.name,p2.price
 )
 
+-- data テーブルに存在「しない」データを探す
+-- +-----------+--------+
+-- | meeting   | person |
+-- +-----------+--------+
+-- | 第１回    | 宮田   |
+-- | 第２回    | 坂東   |
+-- | 第２回    | 水島   |
+-- | 第３回    | 伊藤   |
+-- +-----------+--------+
 
+-- step1-1 まずは皆勤テーブルをつくる(これが難しい!)
+-- まずは直積で全組み合わせを作る
+SELECT
+  M1.meeting, M2.person
+FROM
+  Meetings M1,Meetings M2
+ORDER BY
+  M1.meeting, M2.person
 
-
+--step1-2 その中で回数とM2の人間でDISTINTで重複を避ける
+-- 全結合テーブルをみないとなぜM1.meetingとM2.personをとるのかがイメージしにくい
+SELECT
+  DISTINCT M1.meeting, M2.person
+FROM
+  Meetings M1,Meetings M2
+ORDER BY
+  M1.meeting, M2.person
 
 
