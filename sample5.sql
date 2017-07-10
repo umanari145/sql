@@ -221,4 +221,36 @@ FROM
 GROUP BY tbl_1.student_id
 HAVING SUM(tbl_1.score_div) = 2
 
--- NOT EXISTSを使った方法(本はこれ)
+
+--3人以上座れる積
+--goal
+-- +------------+-----------+
+-- | first_seat | last_seat |
+-- +------------+-----------+
+-- |          3 |         5 |
+-- |          7 |         9 |
+-- |          8 |        10 |
+-- |          9 |        11 |
+-- +------------+-----------+
+
+--step1 まずは自己結合にて始点と終点を決める
+SELECT
+ s1.seat AS first_seat,
+ s1.status AS first_status,
+ s2.seat AS last_seat,
+ s2.status AS last_statues
+FROM
+ Seats s1, Seats s2
+WHERE
+  s2.seat = s1.seat + 2
+
+--step2 空のレコードがあいだに存在していない条件を追加
+SELECT
+ s1.seat AS first_seat,
+ s2.seat AS last_seat
+FROM
+ Seats s1, Seats s2
+WHERE
+  s2.seat = s1.seat + 2
+AND
+  NOT EXISTS ( SELECT * FROM Seats s3 WHERE s3.seat BETWEEN s1.seat AND s2.seat AND s3.status = '占');
