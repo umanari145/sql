@@ -113,7 +113,7 @@ SELECT
 FROM
   sales2 s1
 LEFT JOIN
-  sales s3
+  sales2 s3
 ON
   s3.year =
    ( SELECT MAX(s2.year) FROM sales2 s2 WHERE s2.year < s1.year )
