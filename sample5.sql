@@ -89,6 +89,18 @@ WHERE
         es.emp = es2.emp
   );
 
+--別解(EXCEPTを使わずに)
+SELECT
+  es.emp
+FROM
+  EmpSkills es
+INNER JOIN
+  Skills s
+ON
+  es.skill = s.skill
+GROUP BY
+  es.emp
+HAVING COUNT(*) = (SELECT COUNT(*) FROM Skills)
 
 -- data read.mdのリンクの等しい部分集合を見つける
 --               s1_sup              |              s2_sup              | cnt
