@@ -32,7 +32,27 @@ WHERE
      oi.item_id = 13
    )
 
- 1-3 ランク重複を含んだ処理
+ 1-3 未納データ
+  SELECT
+   DISTINCT t1.customer_id
+  FROM
+   tainousha t1
+  WHERE
+   NOT EXISTS
+   (
+     SELECT
+       *
+     FROM
+       tainousha t2
+     WHERE
+         t2.customer_id = t1.customer_id
+       AND
+        t2.invoice_month BETWEEN  '2017-06-01' AND '2017-08-01'
+       AND
+       t2.payment_status = 10
+   );
+
+ 1-4 ランク重複を含んだ処理
  SELECT
   p1.name,
   p1.price,
@@ -55,26 +75,6 @@ SELECT
  DENSE_RANK() OVER ( ORDER BY price DESC ) AS rank2
 FROM
  products;
-
-1-4 未納データ
- SELECT
-  DISTINCT t1.customer_id
- FROM
-  tainousha t1
- WHERE
-  NOT EXISTS
-  (
-    SELECT
-      *
-    FROM
-      tainousha t2
-    WHERE
-        t2.customer_id = t1.customer_id
-      AND
-       t2.invoice_month BETWEEN  '2017-06-01' AND '2017-08-01'
-      AND
-        t2.payment_status = 10
-  );
 
 2-1 総当たりを求めよ
 自分を含んだ総当たり
@@ -135,6 +135,7 @@ FROM
   sa.year- 1 = sb.year
  ORDER BY
   this_year
+
  (1900年もでる)
   SELECT
    sa.year as this_year,
@@ -219,9 +220,9 @@ FROM
 SELECT
  sa.year as this_year,
  CASE
-   WHEN sb.sale - sa.sale > 0 THEN '↑'
-   WHEN sb.sale - sa.sale = 0 THEN '='
-   WHEN sb.sale - sa.sale < 0 THEN '↑'
+   WHEN sa.sale - sb.sale > 0 THEN '↑'
+   WHEN sa.sale - sb.sale = 0 THEN '='
+   WHEN sa.sale - sb.sale < 0 THEN '↓'
  ELSE '-' END  as diff
 FROM
  sales sa
@@ -236,7 +237,7 @@ ORDER BY
 whereとの違い
 GROUP BYで絞った後の抽出
 https://dev.classmethod.jp/server-side/db/difference-where-and-having/
-
+4-1
 SELECT
  class,
  COUNT(*)
@@ -246,7 +247,7 @@ GROUP BY
  class
 HAVING COUNT(*) >= 3
 
-商品を全て含む
+4-2 商品を全て含む
 SELECT
  si.shop,
  si.item as shop_item,
@@ -270,7 +271,7 @@ ON
   si.shop
  HAVING COUNT(i.item)  >= (SELECT COUNT(i2.item) FROM items i2)
 
-点数問題
+4-3 点数問題
 EXISTSのみ
 SELECT
  DISTINCT(ts1.student_id)
