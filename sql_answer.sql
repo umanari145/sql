@@ -292,8 +292,6 @@ WHERE
   ts1.student_id
  HAVING pass_1 = 1 AND pass_2 = 1
 
-
-
 まずは性別、年齢テーブル
  SELECT
   age.age_class,
@@ -372,7 +370,6 @@ FROM (
   T1.age_class = pop.age_class AND
   T1.sex_cd = pop.sex_cd
  GROUP BY T1.age_class, T1.sex_cd DESC
-
 
  高速化のコツ
  1.問題点の発見(slow_query_logや直書きでの測定、フレームワークのデバッガなど)
