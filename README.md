@@ -19,12 +19,14 @@ http://www.geocities.jp/mickindex/database/db_support_sinan.html
 - sql_answer.sql セミナー用の解答SQL
 
 ## MySQL→PostgreSQLへの移行
-`--compatible=postgresql`は全然万能ではない
+`--compatible=postgresql`は全然万能ではない<br>
 移行時の注意
  - クオートいらない
  - 使用されない型(tinyintなど)に注意
  - 使用されない情報(unsgined)に注意
  - インデックスがそのまま移行できない
+
+MySQLからダンプするとき定義を出して、手動で定義の修正後、データのインポートをするのがもっとも簡易
 
 定義
 ```
@@ -35,3 +37,6 @@ mysqldump -uroot -p データベース名 --compatible=postgresql -d --skip-quot
 ```
 mysqldump -uroot -p データベース名 --compatible=postgresql -c -t --extended-insert --skip-quote-names --skip-add-locks --default-character-set=utf8 > データベースデータ.sql
 ```
+
+同一環境にMySQLあればpgloaderが一番正確かも・・・<br>
+https://pgloader.io/
