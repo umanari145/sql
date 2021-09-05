@@ -48,7 +48,6 @@ https://qiita.com/takanemu/items/be99c7445f5832f45064
 
 ```
 /opt/mssql-tools/bin/sqlcmd -S localhost -U sa
-```
 
 一般のSQL文;
 go
@@ -93,3 +92,4 @@ insert
 2> insert into users values ('hanako', '2', '2020-03-02');
 3> insert into users values ('山田太郎', '1', '2020-03-03T01:23:45.678');
 4> go
+```
