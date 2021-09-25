@@ -17,6 +17,7 @@ http://www.geocities.jp/mickindex/database/db_support_sinan.html
 - sql_seminar.sql セミナー用のDB構成のSQL文
 - sql_seminar_question.sql セミナー用の問題
 - sql_answer.sql セミナー用の解答SQL
+- big_data.sql 「ビッグデータ分析・活用のためのSQLレシピ」のcreate文
 
 ## MySQL→PostgreSQLへの移行
 `--compatible=postgresql`は全然万能ではない<br>
