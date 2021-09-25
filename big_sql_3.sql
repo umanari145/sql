@@ -51,3 +51,53 @@ FROM
   split_part(substring(url, '//[^/]+([^?#]+)'), '/', 3) AS path2
 FROM
  access_log;
+
+/** 以下の処理はtimestamp型でないと使えない **/
+SELECT 
+  stamp,
+  extract(YEAR FROM stamp) AS YEAR,
+  extract(MONTH FROM stamp) AS month,
+  extract(DAY FROM stamp) AS DAY
+FROM
+ (SELECT cast('2016-01-31' AS timestamp) AS stamp) AS t;
+
+/** 通常の文字の場合は以下のようにsubstringを使えばOK **/
+SELECT 
+  stamp,
+  substr(stamp,1,4) AS YEAR
+FROM
+  access_log;
+
+/** coalesceはMySQLのIFnullに近い **/
+SELECT 
+  amount,
+  coupon,
+  amount - coupon AS discount,
+  amount - coalesce(coupon,0) AS discount2
+FROM
+  purchase_log_with_coupon
+
+/** 差分の可視化 singは0より大きい、0と同じ、0より小さいの判定 **/
+SELECT 
+  year,
+  q2-q1 AS q2_q1_diff,
+  CASE 
+    WHEN q2 - q1 > 0 THEN '+'
+    WHEN q2 - q1 = 0 THEN '='
+    WHEN q2 - q1 < 0 THEN '-'
+  END AS judge_q2_q1,
+  sign(q2-q1)  AS sign_q2_q1
+FROM 
+  quarterly_sales
+
+/** greatest(least)は横軸でMAX(MIN)の値を取得できる**/
+SELECT
+  year,
+  q1,
+  q2,
+  q3,
+  q4,
+  greatest(q1,q2,q3,q4) AS max_sales,
+  least(q1,q2,q3,q4) AS min_sales
+FROM 
+  quarterly_sales 

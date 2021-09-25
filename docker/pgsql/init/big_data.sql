@@ -26,3 +26,34 @@ VALUES
   , ('2016-08-26 12:02:01', 'https://www.other.com/'                               , 'http://www.example.com/book/detail?id=002' )
 ;
 
+
+DROP TABLE IF EXISTS purchase_log_with_coupon;
+CREATE TABLE purchase_log_with_coupon (
+    purchase_id varchar(255)
+  , amount      integer
+  , coupon      integer
+);
+
+INSERT INTO purchase_log_with_coupon
+VALUES
+    ('10001', 3280, NULL)
+  , ('10002', 4650,  500)
+  , ('10003', 3870, NULL)
+;
+
+
+DROP TABLE IF EXISTS quarterly_sales;
+CREATE TABLE quarterly_sales (
+    year integer
+  , q1   integer
+  , q2   integer
+  , q3   integer
+  , q4   integer
+);
+
+INSERT INTO quarterly_sales
+VALUES
+    (2015, 82000, 83000, 78000, 83000)
+  , (2016, 85000, 85000, 80000, 81000)
+  , (2017, 92000, 81000, NULL , NULL )
+;
