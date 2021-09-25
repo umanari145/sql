@@ -12,6 +12,8 @@ http://www.geocities.jp/mickindex/database/db_support_sinan.html
 - sample3.sql HAVINGの活用
 - sample4.sql 前年度との比較問題,EXISTSの活用
 - sample5.sql NOT EXISTSなど
+- big_sql_3.sql 3章の抽出
+
 
 ## セミナー用問題
 - sql_seminar.sql セミナー用のDB構成のSQL文
