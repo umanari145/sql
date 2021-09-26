@@ -68,7 +68,8 @@ SELECT
 FROM
   access_log;
 
-/** coalesceはMySQLのIFnullに近い **/
+/** coalesceはMySQLのIFnullに近い(複数の値を取れる) **/
+/** https://www.wakuwakubank.com/posts/786-mysql-null-ifnull-coalesce/ **/
 SELECT 
   amount,
   coupon,
@@ -101,3 +102,64 @@ SELECT
   least(q1,q2,q3,q4) AS min_sales
 FROM 
   quarterly_sales 
+
+
+SELECT 
+  dt,
+  ad_id,
+  clicks,
+  impressions,
+  /** 小数点以下が無視される **/
+  clicks  / impressions AS ctr0 ,
+  /** 小数点にcastをする **/
+  cast(clicks AS DOUBLE precision) / impressions AS ctr1,
+  /** 数値をかけると自動的に変換される **/
+  100.0 * clicks / impressions AS ctr2
+FROM
+  advertising_stats
+WHERE
+  dt = '2017-04-01'
+
+SELECT 
+  x1,
+  x2,
+  /** 絶対値 **/ 
+  ABS(x2-x1) AS ABS,
+  /** 塁上 **/ 
+  power(x1-x2, 2) AS POWER
+FROM
+  location_1d
+
+SELECT 
+  x1,
+  x2,
+  y1,
+  y2,
+  /** ３平方の定理の活用 **/
+  sqrt(POWER(x2-x1,2) + POWER(y2-y1,2)) AS distance1,
+  /** postgresのみで使える手法 **/
+  point(x1,y1) <-> point(x2,y2) AS distance2
+FROM
+  location_2d
+
+SELECT 
+  *,
+  /** 文字列を時間(timestamp)に変換し、追加処理 **/
+  register_stamp::TIMESTAMP + '1 hour'::INTERVAL AS after_1hours_str,
+  /** 元々のtimestampはそのまま追加できる **/
+  register_stamp_ts + '1 hour'::INTERVAL AS after_1hours,
+  register_stamp_ts - '30 minutes'::INTERVAL AS before_30hours
+FROM 
+  mst_users_with_birthday
+
+SELECT 
+  *,
+  /** 文字列を時間(timestamp)に変換し、追加処理 **/
+  register_stamp::TIMESTAMP + '1 hour'::INTERVAL AS after_1hours_str,
+  /** 元々のtimestampはそのまま追加できる **/
+  register_stamp_ts + '1 hour'::INTERVAL AS after_1hours,
+  register_stamp_ts - '30 minutes'::INTERVAL AS before_30hours,
+  birth_date_ts + '1 day'::INTERVAL AS after_1days_ts,
+  (birth_date_ts + '1 day'::INTERVAL)::DATE AS after_1days_dt
+FROM 
+  mst_users_with_birthday
