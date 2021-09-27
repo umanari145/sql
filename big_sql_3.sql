@@ -163,3 +163,72 @@ SELECT
   (birth_date_ts + '1 day'::INTERVAL)::DATE AS after_1days_dt
 FROM 
   mst_users_with_birthday
+
+
+ SELECT
+  user_id,
+  COUNT(product_id) AS cnt,
+  AVG(score) AS AVG
+FROM
+  review
+GROUP BY
+  user_id
+
+/** https://qiita.com/tlokweng/items/fc13dc30cc1aa28231c5  **/
+/** 順位づけ **/
+SELECT
+  *,
+  /** count(*)は書かなくても成立しそうな気もするが書かないと構文エラーになるため **/
+  count(*) over(ORDER BY score desc) AS score_rank,
+  /** カテゴリーごとのスコアランキングを出力 **/
+  count(*) OVER(PARTITION by category ORDER BY score DESC ) AS score_rank_by_category
+FROM 
+  popular_products
+
+
+/** categoryごとのランキングで二位まで抽出 **/
+SELECT 
+  product_id,
+  category,
+  score,
+  score_rank_by_category
+FROM (
+  SELECT
+    *,
+    /** count(*)は書かなくても成立しそうな気もするが書かないと構文エラーになるため **/
+    count(*) over(ORDER BY score desc) AS score_rank,
+    /** カテゴリーごとのスコアランキングを出力 **/
+    count(*) OVER(PARTITION by category ORDER BY score DESC ) AS score_rank_by_category
+  FROM 
+    popular_products
+) pt
+WHERE
+  score_rank_by_category <= 2
+
+
+/** MAXは最大値というよりは↓のケースでは値そのものを出力する意味合いが強い **/
+SELECT
+  dt,
+  MAX(CASE WHEN INDICATOR = 'impressions' THEN val END) AS impressions,
+  MAX(CASE WHEN INDICATOR = 'sessions' THEN val END) AS sessions,
+  MAX(CASE WHEN INDICATOR = 'users' THEN val END) AS users
+FROM 
+  daily_kpi
+GROUP BY
+  dt
+
+/** groupの中の物をカンマで結合 **/
+SELECT
+  purchase_id,
+  string_agg(product_id, ',') AS concat_product_id
+FROM 
+  purchase_detail_log
+GROUP BY
+  purchase_id
+
+SELECT
+  *  
+FROM 
+  quarterly_sales
+CROSS JOIN
+  ( SELECT 1 AS idx ) pt1
